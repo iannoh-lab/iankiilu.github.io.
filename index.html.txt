@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ian Kiilu — GIS Technician Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <h1>IAN MUTUTU KIILU</h1>
+    <p>GIS Technician | Applied Optics & LiDAR Systems Specialist</p>
+  </div>
+</header>
+
+<nav class="topnav">
+  <ul>
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#mmu">MMU LiDAR Cartography</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+<section id="summary" class="card">
+  <h2>Professional Summary</h2>
+  <p>Applied Optics and Lasers Technology graduate skilled in GIS, remote sensing, and terrain analysis using ArcGIS and QGIS. Experienced in GPS/GNSS mapping, spatial data management, LiDAR-based monitoring, and photogrammetry. Committed to applying optical engineering and geospatial analytics for security and infrastructure applications.</p>
+</section>
+
+<section id="skills" class="card">
+  <h2>Core Competencies</h2>
+  <ul>
+    <li>GIS & Remote Sensing (ArcGIS, QGIS)</li>
+    <li>LiDAR Systems, UAV Mapping, and 3D Modeling</li>
+    <li>Python for Spatial Analysis (ArcPy, QGIS API)</li>
+    <li>GPS/GNSS Field Data Collection & Georeferencing</li>
+    <li>Terrain modeling (DEM), line-of-sight analysis</li>
+    <li>SQL for spatial data, geodatabases</li>
+    <li>Laser safety & optical instrumentation</li>
+  </ul>
+</section>
+
+<section id="projects" class="card">
+  <h2><i data-lucide="radar"></i> Application of LiDAR Technology in Monitoring Human Traffic</h2>
+  <p>Developed a LiDAR-based people-counting and perimeter monitoring prototype using TF Mini LiDAR and LD2410 radar sensors. Processed sensor outputs in Python and QGIS to generate spatial visualizations and traffic density maps for physical security.</p>
+  <a href="projects/LiDAR_HumanTraffic_Report.pdf" target="_blank">View Project Report (PDF)</a>
+</section>
+
+<section id="ai-lidar" class="card">
+  <h2><i data-lucide="cpu"></i> Integration of AI in LiDAR System</h2>
+  <p>This project explores applying machine learning to LiDAR point clouds for detection, classification, and anomaly recognition. Models extract features from 3D point clouds, classify moving vs stationary targets, and feed results into GIS for spatial decision-making.</p>
+  <ul>
+    <li>AI-driven feature extraction from LiDAR point clouds</li>
+    <li>Automated classification, object tracking, and anomaly detection</li>
+    <li>Integration with GIS for spatial analysis and decision support</li>
+    <li>Applications: smart city safety, defense, crowd monitoring</li>
+  </ul>
+  <a href="projects/AI_LiDAR_Integration_Report.pdf" target="_blank">View AI-LiDAR Integration Report (PDF)</a>
+</section>
+
+<section id="mmu" class="card">
+  <h2><i data-lucide="map"></i> MMU LiDAR Cartography Project</h2>
+  <p>This interactive map visualizes simulated LiDAR sensor access points across Multimedia University of Kenya for activity monitoring and campus security. All coordinates are synthetic but geographically realistic for demonstration.</p>
+  <div id="mmuMap" style="height:520px;border-radius:8px;"></div>
+
+<script>
+lucide.createIcons();
+var map = L.map('mmuMap').setView([-1.3570, 36.8070], 16);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+var geojsonData = {
+"type": "FeatureCollection",
+"features": [
+{"type":"Feature","properties":{"id":"MMU-L1","name":"Main Gate - North","model":"TF-Mini-S","coverage":30,"status":"active","notes":"Overlooks primary pedestrian flow"},"geometry":{"type":"Point","coordinates":[36.80685,-1.35672]}},
+{"type":"Feature","properties":{"id":"MMU-L2","name":"Library Roof","model":"TF-Mini-S","coverage":40,"status":"active","notes":"High vantage point"},"geometry":{"type":"Point","coordinates":[36.80610,-1.35720]}},
+{"type":"Feature","properties":{"id":"MMU-L3","name":"Admin Block East","model":"Velodyne VLP-16","coverage":60,"status":"active","notes":"Long-range coverage"},"geometry":{"type":"Point","coordinates":[36.80730,-1.35690]}},
+{"type":"Feature","properties":{"id":"MMU-L4","name":"Sports Field NW","model":"TF-Mini-S","coverage":35,"status":"maintenance","notes":"Intermittent power"},"geometry":{"type":"Point","coordinates":[36.80540,-1.35830]}},
+{"type":"Feature","properties":{"id":"MMU-L5","name":"Hostel Block A","model":"LD2410","coverage":25,"status":"active","notes":"Residence monitoring"},"geometry":{"type":"Point","coordinates":[36.80800,-1.35480]}}
+]
+};
+
+geojsonData.features.forEach(function(f){
+  var coords = f.geometry.coordinates;
+  var radius = f.properties.coverage;
+  var color = (f.properties.status === "active") ? "#2e7d32" : "#ff9800";
+
+  var marker = L.circleMarker([coords[1], coords[0]], {
+    radius: 6, fillColor: color, color: "#fff", weight: 1, fillOpacity: 1
+  }).addTo(map);
+
+  L.circle([coords[1], coords[0]], {
+    color: color, fillColor: color, fillOpacity: 0.15, radius: radius
+  }).addTo(map);
+
+  marker.bindPopup("<b>" + f.properties.name + "</b><br>Model: " + f.properties.model + "<br>Status: " + f.properties.status + "<br>Coverage: " + radius + "m<br><i>" + f.properties.notes + "</i>");
+});
+</script>
+</section>
+
+<section id="contact" class="card">
+  <h2><i data-lucide="mail"></i> Contact & Links</h2>
+  <p>Email: <a href="mailto:iankiilu83@gmail.com">iankiilu83@gmail.com</a></p>
+  <p>Phone: +254 757 143 703</p>
+  <p><a href="documents/Ian_Kiilu_GIS_Technician_CV.docx" target="_blank">Download Full CV (DOCX)</a></p>
+  <p>GitHub: <a href="https://github.com/iannoh-lab" target="_blank"><i data-lucide="github"></i> iannoh-lab</a></p>
+</section>
+</main>
+
+<footer>
+  <p>© 2025 Ian Kiilu — GIS Technician Portfolio • <a href="https://github.com/iannoh-lab" target="_blank"><i data-lucide="github"></i> GitHub</a></p>
+</footer>
+</body>
+</html>
